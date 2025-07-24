@@ -1,0 +1,7 @@
+nohup: ignoring input
+
+> note-taking-app-backend@1.0.0 start
+> node server.js
+
+Note Taking App API server running on port 3000
+Health check: http://localhost:3000/health
