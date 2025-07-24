@@ -1,0 +1,28 @@
+nohup: ignoring input
+127.0.0.1 - - [24/Jul/2025 14:07:31] "GET / HTTP/1.1" 200 -
+127.0.0.1 - - [24/Jul/2025 14:07:32] code 404, message File not found
+127.0.0.1 - - [24/Jul/2025 14:07:32] "GET /favicon.ico HTTP/1.1" 404 -
+127.0.0.1 - - [24/Jul/2025 14:07:38] "GET /assets/ HTTP/1.1" 200 -
+127.0.0.1 - - [24/Jul/2025 14:07:41] "GET /css/ HTTP/1.1" 200 -
+127.0.0.1 - - [24/Jul/2025 14:07:44] "GET /js/ HTTP/1.1" 200 -
+127.0.0.1 - - [24/Jul/2025 14:07:47] "HEAD / HTTP/1.1" 200 -
+127.0.0.1 - - [24/Jul/2025 14:07:47] "GET /assets/ HTTP/1.1" 200 -
+127.0.0.1 - - [24/Jul/2025 14:08:26] "GET /assets/ HTTP/1.1" 200 -
+127.0.0.1 - - [24/Jul/2025 14:08:31] "GET / HTTP/1.1" 200 -
+127.0.0.1 - - [24/Jul/2025 14:08:52] code 404, message File not found
+127.0.0.1 - - [24/Jul/2025 14:08:52] "GET /index.html HTTP/1.1" 404 -
+127.0.0.1 - - [24/Jul/2025 14:08:59] code 404, message File not found
+127.0.0.1 - - [24/Jul/2025 14:08:59] "GET /index.html HTTP/1.1" 404 -
+127.0.0.1 - - [24/Jul/2025 14:09:06] code 404, message File not found
+127.0.0.1 - - [24/Jul/2025 14:09:06] "GET /index.html HTTP/1.1" 404 -
+127.0.0.1 - - [24/Jul/2025 14:11:05] "GET / HTTP/1.1" 200 -
+127.0.0.1 - - [24/Jul/2025 14:11:05] "GET /css/overrides.css HTTP/1.1" 200 -
+127.0.0.1 - - [24/Jul/2025 14:11:05] "GET /js/boot.js HTTP/1.1" 200 -
+127.0.0.1 - - [24/Jul/2025 14:11:06] "GET / HTTP/1.1" 200 -
+127.0.0.1 - - [24/Jul/2025 14:11:07] "GET /css/overrides.css HTTP/1.1" 200 -
+127.0.0.1 - - [24/Jul/2025 14:11:07] "GET /js/boot.js HTTP/1.1" 200 -
+127.0.0.1 - - [24/Jul/2025 14:11:21] code 404, message File not found
+127.0.0.1 - - [24/Jul/2025 14:11:21] "GET /login.html HTTP/1.1" 404 -
+127.0.0.1 - - [24/Jul/2025 14:11:48] "GET /manifest.json HTTP/1.1" 200 -
+127.0.0.1 - - [24/Jul/2025 14:12:40] code 404, message File not found
+127.0.0.1 - - [24/Jul/2025 14:12:40] "GET /login.html?signup=true HTTP/1.1" 404 -
