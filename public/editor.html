@@ -1,0 +1,493 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Editor - Notes App</title>
+  <meta name="description" content="Write and edit your notes with our powerful editor featuring autosave and real-time sync.">
+  
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&family=Literata:ital@0;1&display=swap" rel="stylesheet">
+  
+  <!-- PWA Manifest -->
+  <link rel="manifest" href="/manifest.json">
+  <meta name="theme-color" content="#6366f1">
+  
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Inter', 'ui-sans-serif', 'system-ui'],
+            serif: ['Literata', 'serif']
+          },
+          colors: {
+            brand: { DEFAULT: '#6366f1', dark: '#4f46e5' }
+          }
+        }
+      },
+      darkMode: 'class'
+    };
+  </script>
+  
+  <link rel="stylesheet" href="/css/overrides.css">
+</head>
+<body class="bg-white dark:bg-gray-900 min-h-screen">
+  <!-- Online/Offline Status -->
+  <div id="online-status" class="hidden"></div>
+  
+  <!-- Header -->
+  <header class="bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 sticky top-0 z-30">
+    <div class="px-4 sm:px-6 lg:px-8">
+      <div class="flex justify-between items-center h-16">
+        <!-- Back and Title -->
+        <div class="flex items-center space-x-4 flex-1">
+          <a href="/dashboard.html" class="p-2 rounded-md text-gray-400 hover:text-gray-500 hover:bg-gray-100 dark:hover:bg-gray-700" title="Back to Dashboard">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
+            </svg>
+          </a>
+          
+          <input 
+            type="text" 
+            id="note-title" 
+            placeholder="Untitled" 
+            class="text-xl font-semibold bg-transparent border-none focus:ring-0 focus:outline-none text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 flex-1 max-w-md"
+          />
+        </div>
+        
+        <!-- Actions -->
+        <div class="flex items-center space-x-4">
+          <!-- Save Status -->
+          <div id="save-indicator" class="text-sm text-gray-500 dark:text-gray-400"></div>
+          
+          <!-- Share Button -->
+          <button id="share-btn" class="p-2 rounded-md text-gray-400 hover:text-gray-500 hover:bg-gray-100 dark:hover:bg-gray-700" title="Share Note">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.367 2.684 3 3 0 00-5.367-2.684z"></path>
+            </svg>
+          </button>
+          
+          <!-- More Options -->
+          <div class="relative">
+            <button id="more-options-btn" class="p-2 rounded-md text-gray-400 hover:text-gray-500 hover:bg-gray-100 dark:hover:bg-gray-700" title="More Options">
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 5v.01M12 12v.01M12 19v.01M12 6a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2z"></path>
+              </svg>
+            </button>
+            
+            <!-- Options Dropdown -->
+            <div id="options-menu" class="hidden absolute right-0 mt-2 w-48 bg-white dark:bg-gray-800 rounded-md shadow-lg border border-gray-200 dark:border-gray-700 z-50">
+              <div class="py-1">
+                <button id="move-note-btn" class="block w-full text-left px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700">
+                  Move to Folder
+                </button>
+                <button id="duplicate-note-btn" class="block w-full text-left px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700">
+                  Duplicate Note
+                </button>
+                <div class="border-t border-gray-200 dark:border-gray-700"></div>
+                <button id="delete-note-btn" class="block w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20">
+                  Delete Note
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </header>
+  
+  <!-- Editor -->
+  <main class="flex-1">
+    <div class="max-w-4xl mx-auto">
+      <textarea 
+        id="note-editor"
+        placeholder="Start writing your note..."
+        class="w-full min-h-screen p-8 border-none resize-none focus:ring-0 focus:outline-none bg-transparent text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 font-serif text-lg leading-relaxed"
+      ></textarea>
+    </div>
+  </main>
+  
+  <!-- Share Modal -->
+  <div id="share-modal" class="hidden fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center">
+    <div class="bg-white dark:bg-gray-800 rounded-lg shadow-xl max-w-md w-full mx-4">
+      <div class="p-6">
+        <div class="flex items-center justify-between mb-4">
+          <h3 class="text-lg font-semibold text-gray-900 dark:text-white">Share Note</h3>
+          <button id="close-share-modal" class="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300">
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+            </svg>
+          </button>
+        </div>
+        
+        <form id="share-form" class="space-y-4">
+          <div>
+            <label for="collaborator-email" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+              Email address
+            </label>
+            <input 
+              type="email" 
+              id="collaborator-email" 
+              required
+              class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-brand focus:border-transparent dark:bg-gray-700 dark:text-white"
+              placeholder="Enter email address"
+            />
+          </div>
+          
+          <div>
+            <label for="permission-level" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+              Permission level
+            </label>
+            <select 
+              id="permission-level"
+              class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-brand focus:border-transparent dark:bg-gray-700 dark:text-white"
+            >
+              <option value="view">Can view</option>
+              <option value="comment">Can comment</option>
+              <option value="edit">Can edit</option>
+            </select>
+          </div>
+          
+          <div class="flex justify-end space-x-3 pt-4">
+            <button type="button" id="cancel-share" class="btn btn-secondary">
+              Cancel
+            </button>
+            <button type="submit" id="send-invite" class="btn btn-primary">
+              Send Invite
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+  
+  <!-- Move Note Modal -->
+  <div id="move-modal" class="hidden fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center">
+    <div class="bg-white dark:bg-gray-800 rounded-lg shadow-xl max-w-md w-full mx-4">
+      <div class="p-6">
+        <div class="flex items-center justify-between mb-4">
+          <h3 class="text-lg font-semibold text-gray-900 dark:text-white">Move Note</h3>
+          <button id="close-move-modal" class="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300">
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+            </svg>
+          </button>
+        </div>
+        
+        <div class="space-y-4">
+          <div>
+            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+              Select folder
+            </label>
+            <div id="folders-list" class="space-y-2 max-h-48 overflow-y-auto">
+              <!-- Folders will be loaded here -->
+            </div>
+          </div>
+          
+          <div class="flex justify-end space-x-3 pt-4">
+            <button type="button" id="cancel-move" class="btn btn-secondary">
+              Cancel
+            </button>
+            <button type="button" id="confirm-move" class="btn btn-primary">
+              Move Note
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <script type="module">
+    import { requireSession } from '/js/auth.js';
+    import { notesManager } from '/js/notes.js';
+    import { inviteCollaborator, moveNote } from '/js/api.js';
+    import { toast, confirm } from '/js/ui.js';
+    
+    // Check authentication
+    const session = await requireSession();
+    if (!session) return;
+    
+    // Get note ID from URL
+    const urlParams = new URLSearchParams(window.location.search);
+    const noteId = urlParams.get('id');
+    const isNewNote = urlParams.get('new') === 'true';
+    
+    if (!noteId && !isNewNote) {
+      window.location.href = '/dashboard.html';
+      return;
+    }
+    
+    // DOM elements
+    const noteTitle = document.getElementById('note-title');
+    const noteEditor = document.getElementById('note-editor');
+    const shareBtn = document.getElementById('share-btn');
+    const shareModal = document.getElementById('share-modal');
+    const shareForm = document.getElementById('share-form');
+    const closeShareModal = document.getElementById('close-share-modal');
+    const cancelShare = document.getElementById('cancel-share');
+    const moreOptionsBtn = document.getElementById('more-options-btn');
+    const optionsMenu = document.getElementById('options-menu');
+    const moveNoteBtn = document.getElementById('move-note-btn');
+    const duplicateNoteBtn = document.getElementById('duplicate-note-btn');
+    const deleteNoteBtn = document.getElementById('delete-note-btn');
+    const moveModal = document.getElementById('move-modal');
+    const closeMoveModal = document.getElementById('close-move-modal');
+    const cancelMove = document.getElementById('cancel-move');
+    const confirmMove = document.getElementById('confirm-move');
+    const foldersListEl = document.getElementById('folders-list');
+    
+    // State
+    let currentNote = null;
+    let folders = [];
+    let selectedFolderId = null;
+    
+    // Initialize
+    await init();
+    
+    async function init() {
+      if (isNewNote) {
+        // Create new note
+        const result = await notesManager.createNote();
+        if (result.success) {
+          currentNote = result.data;
+          // Update URL without 'new' parameter
+          window.history.replaceState({}, '', `/editor.html?id=${currentNote.id}`);
+        } else {
+          toast('Failed to create note', 'error');
+          window.location.href = '/dashboard.html';
+          return;
+        }
+      } else {
+        // Load existing note
+        const result = await notesManager.getNote(noteId);
+        if (result.success) {
+          currentNote = result.data;
+          noteTitle.value = currentNote.title || '';
+          noteEditor.value = currentNote.body || '';
+        } else {
+          toast('Note not found', 'error');
+          window.location.href = '/dashboard.html';
+          return;
+        }
+      }
+      
+      // Load folders for move functionality
+      await loadFolders();
+      
+      // Setup autosave
+      notesManager.setupTitleAutosave(currentNote.id, noteTitle);
+      notesManager.setupAutosave(currentNote.id, noteEditor);
+      
+      // Setup event listeners
+      setupEventListeners();
+      
+      // Focus editor
+      noteEditor.focus();
+    }
+    
+    function setupEventListeners() {
+      // Share functionality
+      shareBtn.addEventListener('click', openShareModal);
+      closeShareModal.addEventListener('click', closeShareModalHandler);
+      cancelShare.addEventListener('click', closeShareModalHandler);
+      shareModal.addEventListener('click', (e) => {
+        if (e.target === shareModal) closeShareModalHandler();
+      });
+      
+      shareForm.addEventListener('submit', handleShare);
+      
+      // More options menu
+      moreOptionsBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        optionsMenu.classList.toggle('hidden');
+      });
+      
+      document.addEventListener('click', () => {
+        optionsMenu.classList.add('hidden');
+      });
+      
+      // Note actions
+      moveNoteBtn.addEventListener('click', openMoveModal);
+      duplicateNoteBtn.addEventListener('click', duplicateNote);
+      deleteNoteBtn.addEventListener('click', deleteNote);
+      
+      // Move modal
+      closeMoveModal.addEventListener('click', closeMoveModalHandler);
+      cancelMove.addEventListener('click', closeMoveModalHandler);
+      confirmMove.addEventListener('click', handleMoveNote);
+      moveModal.addEventListener('click', (e) => {
+        if (e.target === moveModal) closeMoveModalHandler();
+      });
+      
+      // Keyboard shortcuts
+      document.addEventListener('keydown', (e) => {
+        if ((e.metaKey || e.ctrlKey) && e.key === 's') {
+          e.preventDefault();
+          // Manual save is handled by autosave
+          toast('Note saved', 'success');
+        }
+      });
+    }
+    
+    async function loadFolders() {
+      try {
+        const result = await notesManager.getFolders();
+        if (result.success) {
+          folders = result.data;
+        }
+      } catch (error) {
+        console.error('Error loading folders:', error);
+      }
+    }
+    
+    function openShareModal() {
+      shareModal.classList.remove('hidden');
+      document.getElementById('collaborator-email').focus();
+    }
+    
+    function closeShareModalHandler() {
+      shareModal.classList.add('hidden');
+      shareForm.reset();
+    }
+    
+    async function handleShare(e) {
+      e.preventDefault();
+      const submitBtn = document.getElementById('send-invite');
+      const originalText = submitBtn.textContent;
+      
+      try {
+        submitBtn.textContent = 'Sending...';
+        submitBtn.disabled = true;
+        
+        const formData = new FormData(e.target);
+        const email = document.getElementById('collaborator-email').value;
+        const role = document.getElementById('permission-level').value;
+        
+        const result = await inviteCollaborator(currentNote.id, email, role);
+        
+        if (result.success) {
+          toast('Invitation sent successfully', 'success');
+          closeShareModalHandler();
+        } else {
+          toast(result.error || 'Failed to send invitation', 'error');
+        }
+      } catch (error) {
+        console.error('Error sharing note:', error);
+        toast('Failed to send invitation', 'error');
+      } finally {
+        submitBtn.textContent = originalText;
+        submitBtn.disabled = false;
+      }
+    }
+    
+    function openMoveModal() {
+      // Render folders
+      const foldersHTML = [
+        '<button class="w-full text-left p-3 rounded-lg border border-gray-200 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-700 folder-option" data-folder-id="">📁 No folder (Root)</button>',
+        ...folders.map(folder => `
+          <button class="w-full text-left p-3 rounded-lg border border-gray-200 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-700 folder-option" data-folder-id="${folder.id}">
+            📁 ${folder.name}
+          </button>
+        `)
+      ].join('');
+      
+      foldersListEl.innerHTML = foldersHTML;
+      
+      // Add click listeners
+      document.querySelectorAll('.folder-option').forEach(btn => {
+        btn.addEventListener('click', () => {
+          document.querySelectorAll('.folder-option').forEach(b => {
+            b.classList.remove('bg-brand', 'text-white');
+            b.classList.add('border-gray-200', 'dark:border-gray-600');
+          });
+          btn.classList.add('bg-brand', 'text-white');
+          btn.classList.remove('border-gray-200', 'dark:border-gray-600');
+          selectedFolderId = btn.dataset.folderId || null;
+        });
+      });
+      
+      moveModal.classList.remove('hidden');
+    }
+    
+    function closeMoveModalHandler() {
+      moveModal.classList.add('hidden');
+      selectedFolderId = null;
+    }
+    
+    async function handleMoveNote() {
+      if (selectedFolderId === null && currentNote.folder_id === null) {
+        toast('Note is already in the root folder', 'warning');
+        return;
+      }
+      
+      if (selectedFolderId === currentNote.folder_id) {
+        toast('Note is already in this folder', 'warning');
+        return;
+      }
+      
+      try {
+        const result = await moveNote(currentNote.id, selectedFolderId);
+        if (result.success) {
+          toast('Note moved successfully', 'success');
+          currentNote.folder_id = selectedFolderId;
+          closeMoveModalHandler();
+        } else {
+          toast(result.error || 'Failed to move note', 'error');
+        }
+      } catch (error) {
+        console.error('Error moving note:', error);
+        toast('Failed to move note', 'error');
+      }
+    }
+    
+    async function duplicateNote() {
+      try {
+        const result = await notesManager.createNote(
+          `${currentNote.title || 'Untitled'} (Copy)`,
+          currentNote.body || '',
+          currentNote.folder_id
+        );
+        
+        if (result.success) {
+          toast('Note duplicated successfully', 'success');
+          window.location.href = `/editor.html?id=${result.data.id}`;
+        } else {
+          toast('Failed to duplicate note', 'error');
+        }
+      } catch (error) {
+        console.error('Error duplicating note:', error);
+        toast('Failed to duplicate note', 'error');
+      }
+    }
+    
+    async function deleteNote() {
+      const confirmed = await confirm(
+        'Are you sure you want to delete this note? This action cannot be undone.',
+        'Delete Note'
+      );
+      
+      if (!confirmed) return;
+      
+      try {
+        const result = await notesManager.deleteNote(currentNote.id);
+        if (result.success) {
+          toast('Note deleted successfully', 'success');
+          window.location.href = '/dashboard.html';
+        } else {
+          toast('Failed to delete note', 'error');
+        }
+      } catch (error) {
+        console.error('Error deleting note:', error);
+        toast('Failed to delete note', 'error');
+      }
+    }
+  </script>
+  
+  <script type="module" src="/js/boot.js"></script>
+</body>
+</html>

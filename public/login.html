@@ -1,0 +1,494 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Login - Notes App</title>
+  <meta name="description" content="Sign in to your Notes App account or create a new account to start organizing your thoughts.">
+  
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&family=Literata:ital@0;1&display=swap" rel="stylesheet">
+  
+  <!-- PWA Manifest -->
+  <link rel="manifest" href="/manifest.json">
+  <meta name="theme-color" content="#6366f1">
+  
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Inter', 'ui-sans-serif', 'system-ui'],
+            serif: ['Literata', 'serif']
+          },
+          colors: {
+            brand: { DEFAULT: '#6366f1', dark: '#4f46e5' }
+          }
+        }
+      },
+      darkMode: 'class'
+    };
+  </script>
+  
+  <link rel="stylesheet" href="/css/overrides.css">
+</head>
+<body class="bg-gray-50 dark:bg-gray-900 min-h-screen flex items-center justify-center">
+  <!-- Online/Offline Status -->
+  <div id="online-status" class="hidden"></div>
+  
+  <div class="max-w-md w-full mx-4">
+    <!-- Logo -->
+    <div class="text-center mb-8">
+      <a href="/" class="inline-flex items-center space-x-2">
+        <div class="w-10 h-10 bg-brand rounded-lg flex items-center justify-center">
+          <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
+          </svg>
+        </div>
+        <span class="text-2xl font-bold text-gray-900 dark:text-white">Notes App</span>
+      </a>
+    </div>
+    
+    <!-- Auth Form Container -->
+    <div class="bg-white dark:bg-gray-800 shadow-xl rounded-lg p-8">
+      <!-- Toggle Buttons -->
+      <div class="flex mb-6 bg-gray-100 dark:bg-gray-700 rounded-lg p-1">
+        <button id="login-tab" class="flex-1 py-2 px-4 rounded-md text-sm font-medium transition-colors">
+          Sign In
+        </button>
+        <button id="signup-tab" class="flex-1 py-2 px-4 rounded-md text-sm font-medium transition-colors">
+          Sign Up
+        </button>
+      </div>
+      
+      <!-- Login Form -->
+      <form id="login-form" class="space-y-6">
+        <div>
+          <h2 class="text-2xl font-bold text-gray-900 dark:text-white mb-2">Welcome back</h2>
+          <p class="text-gray-600 dark:text-gray-400">Sign in to your account to continue</p>
+        </div>
+        
+        <div>
+          <label for="login-email" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+            Email address
+          </label>
+          <input 
+            type="email" 
+            id="login-email" 
+            name="email"
+            required
+            class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-brand focus:border-transparent dark:bg-gray-700 dark:text-white"
+            placeholder="Enter your email"
+          />
+        </div>
+        
+        <div>
+          <label for="login-password" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+            Password
+          </label>
+          <div class="relative">
+            <input 
+              type="password" 
+              id="login-password" 
+              name="password"
+              required
+              class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-brand focus:border-transparent dark:bg-gray-700 dark:text-white pr-10"
+              placeholder="Enter your password"
+            />
+            <button 
+              type="button" 
+              id="toggle-login-password"
+              class="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-400 hover:text-gray-600"
+            >
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path>
+              </svg>
+            </button>
+          </div>
+        </div>
+        
+        <div class="flex items-center justify-between">
+          <label class="flex items-center">
+            <input type="checkbox" class="rounded border-gray-300 text-brand focus:ring-brand">
+            <span class="ml-2 text-sm text-gray-600 dark:text-gray-400">Remember me</span>
+          </label>
+          <button type="button" id="forgot-password-btn" class="text-sm text-brand hover:text-brand-dark">
+            Forgot password?
+          </button>
+        </div>
+        
+        <button 
+          type="submit" 
+          id="login-submit"
+          class="w-full btn btn-primary py-3"
+        >
+          Sign In
+        </button>
+      </form>
+      
+      <!-- Signup Form -->
+      <form id="signup-form" class="space-y-6 hidden">
+        <div>
+          <h2 class="text-2xl font-bold text-gray-900 dark:text-white mb-2">Create account</h2>
+          <p class="text-gray-600 dark:text-gray-400">Start your note-taking journey today</p>
+        </div>
+        
+        <div>
+          <label for="signup-email" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+            Email address
+          </label>
+          <input 
+            type="email" 
+            id="signup-email" 
+            name="email"
+            required
+            class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-brand focus:border-transparent dark:bg-gray-700 dark:text-white"
+            placeholder="Enter your email"
+          />
+        </div>
+        
+        <div>
+          <label for="signup-password" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+            Password
+          </label>
+          <div class="relative">
+            <input 
+              type="password" 
+              id="signup-password" 
+              name="password"
+              required
+              minlength="6"
+              class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-brand focus:border-transparent dark:bg-gray-700 dark:text-white pr-10"
+              placeholder="Create a password (min. 6 characters)"
+            />
+            <button 
+              type="button" 
+              id="toggle-signup-password"
+              class="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-400 hover:text-gray-600"
+            >
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path>
+              </svg>
+            </button>
+          </div>
+          <div class="mt-1 text-xs text-gray-500 dark:text-gray-400">
+            Password must be at least 6 characters long
+          </div>
+        </div>
+        
+        <div>
+          <label class="flex items-start">
+            <input type="checkbox" required class="mt-1 rounded border-gray-300 text-brand focus:ring-brand">
+            <span class="ml-2 text-sm text-gray-600 dark:text-gray-400">
+              I agree to the <a href="#" class="text-brand hover:text-brand-dark">Terms of Service</a> 
+              and <a href="#" class="text-brand hover:text-brand-dark">Privacy Policy</a>
+            </span>
+          </label>
+        </div>
+        
+        <button 
+          type="submit" 
+          id="signup-submit"
+          class="w-full btn btn-primary py-3"
+        >
+          Create Account
+        </button>
+        
+        <div class="text-center text-sm text-gray-600 dark:text-gray-400">
+          By signing up, you'll receive a confirmation email to verify your account.
+        </div>
+      </form>
+      
+      <!-- Reset Password Form -->
+      <form id="reset-form" class="space-y-6 hidden">
+        <div>
+          <h2 class="text-2xl font-bold text-gray-900 dark:text-white mb-2">Reset password</h2>
+          <p class="text-gray-600 dark:text-gray-400">Enter your email to receive a reset link</p>
+        </div>
+        
+        <div>
+          <label for="reset-email" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+            Email address
+          </label>
+          <input 
+            type="email" 
+            id="reset-email" 
+            name="email"
+            required
+            class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-brand focus:border-transparent dark:bg-gray-700 dark:text-white"
+            placeholder="Enter your email"
+          />
+        </div>
+        
+        <button 
+          type="submit" 
+          id="reset-submit"
+          class="w-full btn btn-primary py-3"
+        >
+          Send Reset Link
+        </button>
+        
+        <button 
+          type="button" 
+          id="back-to-login"
+          class="w-full btn btn-secondary py-3"
+        >
+          Back to Sign In
+        </button>
+      </form>
+    </div>
+    
+    <!-- Footer Links -->
+    <div class="mt-8 text-center">
+      <p class="text-sm text-gray-600 dark:text-gray-400">
+        Don't have an account? 
+        <button id="switch-to-signup" class="text-brand hover:text-brand-dark font-medium">
+          Sign up here
+        </button>
+      </p>
+      <div class="mt-4">
+        <a href="/" class="text-sm text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300">
+          ← Back to home
+        </a>
+      </div>
+    </div>
+  </div>
+  
+  <script type="module">
+    import { signIn, signUp, resetPassword, onAuthStateChange } from '/js/auth.js';
+    import { toast } from '/js/ui.js';
+    
+    // DOM elements
+    const loginTab = document.getElementById('login-tab');
+    const signupTab = document.getElementById('signup-tab');
+    const loginForm = document.getElementById('login-form');
+    const signupForm = document.getElementById('signup-form');
+    const resetForm = document.getElementById('reset-form');
+    const forgotPasswordBtn = document.getElementById('forgot-password-btn');
+    const backToLoginBtn = document.getElementById('back-to-login');
+    const switchToSignupBtn = document.getElementById('switch-to-signup');
+    
+    // Password toggle buttons
+    const toggleLoginPassword = document.getElementById('toggle-login-password');
+    const toggleSignupPassword = document.getElementById('toggle-signup-password');
+    
+    // Check URL parameters for initial mode
+    const urlParams = new URLSearchParams(window.location.search);
+    const mode = urlParams.get('mode');
+    
+    // Initialize form state
+    let currentMode = mode === 'signup' ? 'signup' : 'login';
+    updateFormDisplay();
+    
+    // Tab switching
+    loginTab.addEventListener('click', () => {
+      currentMode = 'login';
+      updateFormDisplay();
+    });
+    
+    signupTab.addEventListener('click', () => {
+      currentMode = 'signup';
+      updateFormDisplay();
+    });
+    
+    switchToSignupBtn.addEventListener('click', () => {
+      currentMode = 'signup';
+      updateFormDisplay();
+    });
+    
+    // Forgot password
+    forgotPasswordBtn.addEventListener('click', () => {
+      currentMode = 'reset';
+      updateFormDisplay();
+    });
+    
+    backToLoginBtn.addEventListener('click', () => {
+      currentMode = 'login';
+      updateFormDisplay();
+    });
+    
+    // Password visibility toggles
+    toggleLoginPassword.addEventListener('click', () => {
+      const passwordInput = document.getElementById('login-password');
+      const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
+      passwordInput.setAttribute('type', type);
+    });
+    
+    toggleSignupPassword.addEventListener('click', () => {
+      const passwordInput = document.getElementById('signup-password');
+      const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
+      passwordInput.setAttribute('type', type);
+    });
+    
+    // Form submissions
+    loginForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const submitBtn = document.getElementById('login-submit');
+      const originalText = submitBtn.textContent;
+      
+      try {
+        submitBtn.textContent = 'Signing in...';
+        submitBtn.disabled = true;
+        
+        const formData = new FormData(e.target);
+        const email = formData.get('email');
+        const password = formData.get('password');
+        
+        const result = await signIn(email, password);
+        
+        if (result.success) {
+          toast('Welcome back!', 'success');
+          // Redirect will be handled by auth state change
+        } else {
+          toast(result.error, 'error');
+        }
+      } catch (error) {
+        toast('An error occurred. Please try again.', 'error');
+      } finally {
+        submitBtn.textContent = originalText;
+        submitBtn.disabled = false;
+      }
+    });
+    
+    signupForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const submitBtn = document.getElementById('signup-submit');
+      const originalText = submitBtn.textContent;
+      
+      try {
+        submitBtn.textContent = 'Creating account...';
+        submitBtn.disabled = true;
+        
+        const formData = new FormData(e.target);
+        const email = formData.get('email');
+        const password = formData.get('password');
+        
+        const result = await signUp(email, password);
+        
+        if (result.success) {
+          toast('Account created! Please check your email to verify your account.', 'success');
+          // Switch to login form
+          currentMode = 'login';
+          updateFormDisplay();
+        } else {
+          toast(result.error, 'error');
+        }
+      } catch (error) {
+        toast('An error occurred. Please try again.', 'error');
+      } finally {
+        submitBtn.textContent = originalText;
+        submitBtn.disabled = false;
+      }
+    });
+    
+    resetForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const submitBtn = document.getElementById('reset-submit');
+      const originalText = submitBtn.textContent;
+      
+      try {
+        submitBtn.textContent = 'Sending...';
+        submitBtn.disabled = true;
+        
+        const formData = new FormData(e.target);
+        const email = formData.get('email');
+        
+        const result = await resetPassword(email);
+        
+        if (result.success) {
+          toast('Password reset link sent! Check your email.', 'success');
+          currentMode = 'login';
+          updateFormDisplay();
+        } else {
+          toast(result.error, 'error');
+        }
+      } catch (error) {
+        toast('An error occurred. Please try again.', 'error');
+      } finally {
+        submitBtn.textContent = originalText;
+        submitBtn.disabled = false;
+      }
+    });
+    
+    function updateFormDisplay() {
+      // Hide all forms
+      loginForm.classList.add('hidden');
+      signupForm.classList.add('hidden');
+      resetForm.classList.add('hidden');
+      
+      // Update tabs
+      loginTab.classList.remove('bg-white', 'dark:bg-gray-800', 'text-brand', 'shadow-sm');
+      signupTab.classList.remove('bg-white', 'dark:bg-gray-800', 'text-brand', 'shadow-sm');
+      loginTab.classList.add('text-gray-500', 'dark:text-gray-400');
+      signupTab.classList.add('text-gray-500', 'dark:text-gray-400');
+      
+      // Show appropriate form and update tab
+      switch (currentMode) {
+        case 'login':
+          loginForm.classList.remove('hidden');
+          loginTab.classList.remove('text-gray-500', 'dark:text-gray-400');
+          loginTab.classList.add('bg-white', 'dark:bg-gray-800', 'text-brand', 'shadow-sm');
+          switchToSignupBtn.textContent = 'Sign up here';
+          break;
+        case 'signup':
+          signupForm.classList.remove('hidden');
+          signupTab.classList.remove('text-gray-500', 'dark:text-gray-400');
+          signupTab.classList.add('bg-white', 'dark:bg-gray-800', 'text-brand', 'shadow-sm');
+          switchToSignupBtn.textContent = 'Sign in here';
+          break;
+        case 'reset':
+          resetForm.classList.remove('hidden');
+          break;
+      }
+      
+      // Update footer text
+      if (currentMode === 'login') {
+        switchToSignupBtn.parentElement.innerHTML = `
+          Don't have an account? 
+          <button id="switch-to-signup" class="text-brand hover:text-brand-dark font-medium">
+            Sign up here
+          </button>
+        `;
+      } else if (currentMode === 'signup') {
+        switchToSignupBtn.parentElement.innerHTML = `
+          Already have an account? 
+          <button id="switch-to-signup" class="text-brand hover:text-brand-dark font-medium">
+            Sign in here
+          </button>
+        `;
+      }
+      
+      // Re-attach event listener for the new button
+      const newSwitchBtn = document.getElementById('switch-to-signup');
+      if (newSwitchBtn) {
+        newSwitchBtn.addEventListener('click', () => {
+          currentMode = currentMode === 'login' ? 'signup' : 'login';
+          updateFormDisplay();
+        });
+      }
+    }
+    
+    // Handle auth state changes
+    onAuthStateChange((event, session) => {
+      if (event === 'SIGNED_IN' && session) {
+        // Redirect to dashboard
+        window.location.href = '/dashboard.html';
+      }
+    });
+    
+    // Handle password reset from URL hash
+    if (window.location.hash.includes('access_token')) {
+      toast('You can now set a new password', 'success');
+      // Handle password update UI here if needed
+    }
+  </script>
+  
+  <script type="module" src="/js/boot.js"></script>
+</body>
+</html>

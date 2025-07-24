@@ -1,0 +1,123 @@
+/* Custom CSS overrides for Note Taking App */
+
+/* Custom scrollbar styling */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  @apply bg-gray-100 dark:bg-gray-800;
+}
+
+::-webkit-scrollbar-thumb {
+  @apply bg-gray-300 dark:bg-gray-600 rounded-full;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  @apply bg-gray-400 dark:bg-gray-500;
+}
+
+/* Prose styling for editor */
+.prose {
+  max-width: none;
+}
+
+.prose h1, .prose h2, .prose h3, .prose h4, .prose h5, .prose h6 {
+  @apply font-serif;
+}
+
+/* Custom button styles */
+.btn {
+  @apply px-4 py-2 rounded-lg font-medium transition-colors duration-150 focus:outline-none focus:ring-2 focus:ring-offset-2;
+}
+
+.btn-primary {
+  @apply bg-brand text-white hover:bg-brand-dark focus:ring-brand;
+}
+
+.btn-secondary {
+  @apply bg-gray-200 text-gray-900 hover:bg-gray-300 focus:ring-gray-500 dark:bg-gray-700 dark:text-gray-100 dark:hover:bg-gray-600;
+}
+
+.btn-danger {
+  @apply bg-red-600 text-white hover:bg-red-700 focus:ring-red-500;
+}
+
+/* Loading skeleton */
+.skeleton {
+  @apply animate-pulse bg-gray-200 dark:bg-gray-700 rounded;
+}
+
+/* Toast animations */
+.toast-enter {
+  @apply transform translate-x-full opacity-0;
+}
+
+.toast-enter-active {
+  @apply transform translate-x-0 opacity-100 transition-all duration-300 ease-out;
+}
+
+.toast-exit {
+  @apply transform translate-x-0 opacity-100;
+}
+
+.toast-exit-active {
+  @apply transform translate-x-full opacity-0 transition-all duration-300 ease-in;
+}
+
+/* Modal animations */
+.modal-backdrop {
+  @apply fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50;
+}
+
+.modal-content {
+  @apply bg-white dark:bg-gray-800 rounded-lg shadow-xl max-w-md w-full mx-4 transform transition-all duration-200;
+}
+
+/* Focus styles for accessibility */
+.focus-ring {
+  @apply focus:outline-none focus:ring-2 focus:ring-brand focus:ring-offset-2 dark:focus:ring-offset-gray-800;
+}
+
+/* Reduced motion support */
+@media (prefers-reduced-motion: reduce) {
+  .transition-all,
+  .transition-colors,
+  .transition-transform,
+  .animate-pulse,
+  .animate-spin {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* Dark mode improvements */
+.dark {
+  color-scheme: dark;
+}
+
+/* Editor specific styles */
+.editor-content {
+  @apply min-h-screen p-6 font-serif text-lg leading-relaxed;
+}
+
+.editor-content:focus {
+  @apply outline-none;
+}
+
+/* Sidebar styles */
+.sidebar-transition {
+  @apply transition-transform duration-200 ease-out;
+}
+
+/* Note card hover effects */
+.note-card {
+  @apply transition-all duration-150 hover:shadow-md hover:scale-[1.02];
+}
+
+/* Search highlight */
+.search-highlight {
+  @apply bg-yellow-200 dark:bg-yellow-800 px-1 rounded;
+}

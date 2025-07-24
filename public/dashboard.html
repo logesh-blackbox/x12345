@@ -1,0 +1,590 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Dashboard - Notes App</title>
+  <meta name="description" content="Your personal dashboard for managing notes, folders, and organizing your thoughts.">
+  
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&family=Literata:ital@0;1&display=swap" rel="stylesheet">
+  
+  <!-- PWA Manifest -->
+  <link rel="manifest" href="/manifest.json">
+  <meta name="theme-color" content="#6366f1">
+  
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Inter', 'ui-sans-serif', 'system-ui'],
+            serif: ['Literata', 'serif']
+          },
+          colors: {
+            brand: { DEFAULT: '#6366f1', dark: '#4f46e5' }
+          }
+        }
+      },
+      darkMode: 'class'
+    };
+  </script>
+  
+  <link rel="stylesheet" href="/css/overrides.css">
+</head>
+<body class="bg-gray-50 dark:bg-gray-900 min-h-screen">
+  <!-- Online/Offline Status -->
+  <div id="online-status" class="hidden"></div>
+  
+  <!-- Header -->
+  <header class="bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 sticky top-0 z-30">
+    <div class="px-4 sm:px-6 lg:px-8">
+      <div class="flex justify-between items-center h-16">
+        <!-- Logo and Navigation -->
+        <div class="flex items-center space-x-4">
+          <button id="sidebar-toggle" class="md:hidden p-2 rounded-md text-gray-400 hover:text-gray-500 hover:bg-gray-100 dark:hover:bg-gray-700">
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
+            </svg>
+          </button>
+          
+          <div class="flex items-center space-x-2">
+            <div class="w-8 h-8 bg-brand rounded-lg flex items-center justify-center">
+              <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
+              </svg>
+            </div>
+            <span class="text-xl font-semibold text-gray-900 dark:text-white">Notes</span>
+          </div>
+        </div>
+        
+        <!-- Search and Actions -->
+        <div class="flex items-center space-x-4">
+          <!-- Search Button -->
+          <button id="search-btn" class="p-2 rounded-md text-gray-400 hover:text-gray-500 hover:bg-gray-100 dark:hover:bg-gray-700" title="Search (⌘K)">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+            </svg>
+          </button>
+          
+          <!-- New Note Button -->
+          <button id="new-note-btn" class="btn btn-primary" title="New Note (⌘N)">
+            <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
+            </svg>
+            New Note
+          </button>
+          
+          <!-- User Menu -->
+          <div class="relative">
+            <button id="user-menu-btn" class="flex items-center space-x-2 p-2 rounded-md text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700">
+              <div class="w-8 h-8 bg-brand rounded-full flex items-center justify-center">
+                <span id="user-avatar" class="text-white text-sm font-medium">U</span>
+              </div>
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+              </svg>
+            </button>
+            
+            <!-- User Dropdown -->
+            <div id="user-menu" class="hidden absolute right-0 mt-2 w-48 bg-white dark:bg-gray-800 rounded-md shadow-lg border border-gray-200 dark:border-gray-700 z-50">
+              <div class="py-1">
+                <div class="px-4 py-2 text-sm text-gray-700 dark:text-gray-300 border-b border-gray-200 dark:border-gray-700">
+                  <div class="font-medium" id="user-email">user@example.com</div>
+                  <div class="text-xs text-gray-500 dark:text-gray-400">Free Plan</div>
+                </div>
+                <a href="/settings.html" class="block px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700">
+                  Settings
+                </a>
+                <a href="/billing.html" class="block px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700">
+                  Upgrade to Pro
+                </a>
+                <button id="sign-out-btn" class="block w-full text-left px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700">
+                  Sign Out
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  
+  <div class="flex h-screen pt-16">
+    <!-- Sidebar -->
+    <aside id="sidebar" class="w-64 bg-white dark:bg-gray-800 border-r border-gray-200 dark:border-gray-700 sidebar-transition transform -translate-x-full md:translate-x-0 fixed md:static inset-y-0 left-0 z-20 pt-0">
+      <div class="h-full flex flex-col">
+        <!-- Sidebar Header -->
+        <div class="p-4 border-b border-gray-200 dark:border-gray-700">
+          <button id="new-folder-btn" class="w-full btn btn-secondary text-sm">
+            <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
+            </svg>
+            New Folder
+          </button>
+        </div>
+        
+        <!-- Folders -->
+        <div class="flex-1 overflow-y-auto p-4">
+          <div class="mb-4">
+            <h3 class="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wide mb-2">
+              Folders
+            </h3>
+            <div id="folders-list" class="space-y-1">
+              <!-- Folders will be loaded here -->
+              <div class="skeleton h-6 w-full mb-2"></div>
+              <div class="skeleton h-6 w-3/4 mb-2"></div>
+              <div class="skeleton h-6 w-1/2"></div>
+            </div>
+          </div>
+          
+          <!-- Quick Actions -->
+          <div class="mt-8">
+            <h3 class="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wide mb-2">
+              Quick Actions
+            </h3>
+            <div class="space-y-1">
+              <button class="w-full text-left px-3 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-md">
+                <svg class="w-4 h-4 inline mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"></path>
+                </svg>
+                Favorites
+              </button>
+              <button class="w-full text-left px-3 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-md">
+                <svg class="w-4 h-4 inline mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                </svg>
+                Recent
+              </button>
+              <button class="w-full text-left px-3 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-md">
+                <svg class="w-4 h-4 inline mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
+                </svg>
+                Trash
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </aside>
+    
+    <!-- Sidebar Overlay (Mobile) -->
+    <div id="sidebar-overlay" class="fixed inset-0 bg-black bg-opacity-50 z-10 md:hidden hidden"></div>
+    
+    <!-- Main Content -->
+    <main class="flex-1 overflow-hidden">
+      <div class="h-full flex flex-col">
+        <!-- Content Header -->
+        <div class="bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 px-6 py-4">
+          <div class="flex items-center justify-between">
+            <div>
+              <h1 class="text-2xl font-bold text-gray-900 dark:text-white">All Notes</h1>
+              <p class="text-sm text-gray-600 dark:text-gray-400 mt-1">
+                <span id="notes-count">0</span> notes
+              </p>
+            </div>
+            
+            <!-- View Options -->
+            <div class="flex items-center space-x-2">
+              <button id="grid-view-btn" class="p-2 rounded-md text-gray-400 hover:text-gray-500 hover:bg-gray-100 dark:hover:bg-gray-700" title="Grid View">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"></path>
+                </svg>
+              </button>
+              <button id="list-view-btn" class="p-2 rounded-md text-gray-500 bg-gray-100 dark:bg-gray-700 dark:text-gray-300" title="List View">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 10h16M4 14h16M4 18h16"></path>
+                </svg>
+              </button>
+            </div>
+          </div>
+        </div>
+        
+        <!-- Notes Grid/List -->
+        <div class="flex-1 overflow-y-auto p-6">
+          <div id="notes-container" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            <!-- Loading skeletons -->
+            <div class="note-card bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-4">
+              <div class="skeleton h-6 w-3/4 mb-3"></div>
+              <div class="skeleton h-4 w-full mb-2"></div>
+              <div class="skeleton h-4 w-2/3 mb-4"></div>
+              <div class="skeleton h-3 w-1/3"></div>
+            </div>
+            <div class="note-card bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-4">
+              <div class="skeleton h-6 w-2/3 mb-3"></div>
+              <div class="skeleton h-4 w-full mb-2"></div>
+              <div class="skeleton h-4 w-3/4 mb-4"></div>
+              <div class="skeleton h-3 w-1/4"></div>
+            </div>
+            <div class="note-card bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-4">
+              <div class="skeleton h-6 w-1/2 mb-3"></div>
+              <div class="skeleton h-4 w-full mb-2"></div>
+              <div class="skeleton h-4 w-4/5 mb-4"></div>
+              <div class="skeleton h-3 w-1/3"></div>
+            </div>
+          </div>
+          
+          <!-- Empty State -->
+          <div id="empty-state" class="hidden text-center py-12">
+            <svg class="w-16 h-16 text-gray-400 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
+            </svg>
+            <h3 class="text-lg font-medium text-gray-900 dark:text-white mb-2">No notes yet</h3>
+            <p class="text-gray-600 dark:text-gray-400 mb-6">Get started by creating your first note</p>
+            <button id="empty-new-note-btn" class="btn btn-primary">
+              <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
+              </svg>
+              Create Your First Note
+            </button>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+  
+  <!-- Search Modal -->
+  <div id="search-modal" class="hidden fixed inset-0 bg-black bg-opacity-50 z-50 flex items-start justify-center pt-20">
+    <div class="bg-white dark:bg-gray-800 rounded-lg shadow-xl max-w-2xl w-full mx-4 max-h-96 overflow-hidden">
+      <div class="p-4 border-b border-gray-200 dark:border-gray-700">
+        <div class="relative">
+          <svg class="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+          </svg>
+          <input 
+            type="text" 
+            id="search-input" 
+            placeholder="Search notes..." 
+            class="w-full pl-10 pr-4 py-3 border-0 focus:ring-0 text-lg bg-transparent dark:text-white"
+          />
+        </div>
+      </div>
+      <div id="search-results" class="max-h-64 overflow-y-auto">
+        <div class="p-4 text-center text-gray-500 dark:text-gray-400">
+          Start typing to search your notes...
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <script type="module">
+    import { requireSession, signOut, getCurrentUser } from '/js/auth.js';
+    import { notesManager } from '/js/notes.js';
+    import { searchNotes } from '/js/api.js';
+    import { toast, formatDate, showSkeleton, hideSkeleton, confirm, prompt } from '/js/ui.js';
+    
+    // Check authentication
+    const session = await requireSession();
+    if (!session) return;
+    
+    // DOM elements
+    const sidebarToggle = document.getElementById('sidebar-toggle');
+    const sidebar = document.getElementById('sidebar');
+    const sidebarOverlay = document.getElementById('sidebar-overlay');
+    const userMenuBtn = document.getElementById('user-menu-btn');
+    const userMenu = document.getElementById('user-menu');
+    const signOutBtn = document.getElementById('sign-out-btn');
+    const newNoteBtn = document.getElementById('new-note-btn');
+    const emptyNewNoteBtn = document.getElementById('empty-new-note-btn');
+    const newFolderBtn = document.getElementById('new-folder-btn');
+    const searchBtn = document.getElementById('search-btn');
+    const searchModal = document.getElementById('search-modal');
+    const searchInput = document.getElementById('search-input');
+    const searchResults = document.getElementById('search-results');
+    const notesContainer = document.getElementById('notes-container');
+    const emptyState = document.getElementById('empty-state');
+    const notesCount = document.getElementById('notes-count');
+    const foldersListEl = document.getElementById('folders-list');
+    const userAvatar = document.getElementById('user-avatar');
+    const userEmail = document.getElementById('user-email');
+    
+    // State
+    let notes = [];
+    let folders = [];
+    let currentView = 'grid';
+    
+    // Initialize
+    await init();
+    
+    async function init() {
+      // Load user info
+      const { user } = await getCurrentUser();
+      if (user) {
+        userEmail.textContent = user.email;
+        userAvatar.textContent = user.email.charAt(0).toUpperCase();
+      }
+      
+      // Load data
+      await loadFolders();
+      await loadNotes();
+      
+      // Setup event listeners
+      setupEventListeners();
+    }
+    
+    function setupEventListeners() {
+      // Sidebar toggle
+      sidebarToggle.addEventListener('click', toggleSidebar);
+      sidebarOverlay.addEventListener('click', closeSidebar);
+      
+      // User menu
+      userMenuBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        userMenu.classList.toggle('hidden');
+      });
+      
+      // Close user menu when clicking outside
+      document.addEventListener('click', () => {
+        userMenu.classList.add('hidden');
+      });
+      
+      // Sign out
+      signOutBtn.addEventListener('click', async () => {
+        const result = await signOut();
+        if (result.success) {
+          window.location.href = '/login.html';
+        }
+      });
+      
+      // New note buttons
+      newNoteBtn.addEventListener('click', createNewNote);
+      emptyNewNoteBtn.addEventListener('click', createNewNote);
+      
+      // New folder
+      newFolderBtn.addEventListener('click', createNewFolder);
+      
+      // Search
+      searchBtn.addEventListener('click', openSearch);
+      searchModal.addEventListener('click', (e) => {
+        if (e.target === searchModal) closeSearch();
+      });
+      
+      searchInput.addEventListener('input', handleSearch);
+      searchInput.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape') closeSearch();
+      });
+      
+      // View toggles
+      document.getElementById('grid-view-btn').addEventListener('click', () => setView('grid'));
+      document.getElementById('list-view-btn').addEventListener('click', () => setView('list'));
+    }
+    
+    async function loadNotes() {
+      try {
+        const result = await notesManager.getNotes();
+        if (result.success) {
+          notes = result.data;
+          renderNotes();
+        } else {
+          toast('Failed to load notes', 'error');
+        }
+      } catch (error) {
+        console.error('Error loading notes:', error);
+        toast('Failed to load notes', 'error');
+      }
+    }
+    
+    async function loadFolders() {
+      try {
+        const result = await notesManager.getFolders();
+        if (result.success) {
+          folders = result.data;
+          renderFolders();
+        } else {
+          console.error('Failed to load folders');
+        }
+      } catch (error) {
+        console.error('Error loading folders:', error);
+      }
+    }
+    
+    function renderNotes() {
+      notesCount.textContent = notes.length;
+      
+      if (notes.length === 0) {
+        notesContainer.classList.add('hidden');
+        emptyState.classList.remove('hidden');
+        return;
+      }
+      
+      notesContainer.classList.remove('hidden');
+      emptyState.classList.add('hidden');
+      
+      const notesHTML = notes.map(note => `
+        <div class="note-card bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-4 cursor-pointer group" data-note-id="${note.id}">
+          <div class="flex items-start justify-between mb-3">
+            <h3 class="font-semibold text-gray-900 dark:text-white truncate flex-1 mr-2">
+              ${note.title || 'Untitled'}
+            </h3>
+            <div class="flex items-center space-x-1">
+              ${note.draft ? '<span class="w-2 h-2 bg-yellow-400 rounded-full" title="Draft"></span>' : ''}
+              <button class="note-menu-btn p-1 rounded hover:bg-gray-100 dark:hover:bg-gray-700 opacity-0 group-hover:opacity-100" data-note-id="${note.id}">
+                <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 5v.01M12 12v.01M12 19v.01M12 6a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2z"></path>
+                </svg>
+              </button>
+            </div>
+          </div>
+          <p class="text-gray-600 dark:text-gray-400 text-sm line-clamp-3 mb-4">
+            ${note.body ? note.body.substring(0, 150) + (note.body.length > 150 ? '...' : '') : 'No content'}
+          </p>
+          <div class="flex items-center justify-between text-xs text-gray-500 dark:text-gray-400">
+            <span>${formatDate(note.updated_at)}</span>
+            ${note.folders?.name ? `<span class="bg-gray-100 dark:bg-gray-700 px-2 py-1 rounded">${note.folders.name}</span>` : ''}
+          </div>
+        </div>
+      `).join('');
+      
+      notesContainer.innerHTML = notesHTML;
+      
+      // Add click listeners
+      document.querySelectorAll('.note-card').forEach(card => {
+        card.addEventListener('click', (e) => {
+          if (!e.target.closest('.note-menu-btn')) {
+            const noteId = card.dataset.noteId;
+            window.location.href = `/editor.html?id=${noteId}`;
+          }
+        });
+      });
+    }
+    
+    function renderFolders() {
+      if (folders.length === 0) {
+        foldersListEl.innerHTML = '<div class="text-sm text-gray-500 dark:text-gray-400 italic">No folders yet</div>';
+        return;
+      }
+      
+      const foldersHTML = folders.map(folder => `
+        <button class="w-full text-left px-3 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-md flex items-center" data-folder-id="${folder.id}">
+          <svg class="w-4 h-4 mr-2 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-5l-2-2H5a2 2 0 00-2 2z"></path>
+          </svg>
+          ${folder.name}
+        </button>
+      `).join('');
+      
+      foldersListEl.innerHTML = foldersHTML;
+    }
+    
+    async function createNewNote() {
+      try {
+        const result = await notesManager.createNote();
+        if (result.success) {
+          window.location.href = `/editor.html?id=${result.data.id}`;
+        } else {
+          toast('Failed to create note', 'error');
+        }
+      } catch (error) {
+        console.error('Error creating note:', error);
+        toast('Failed to create note', 'error');
+      }
+    }
+    
+    async function createNewFolder() {
+      const name = await prompt('Enter folder name:', '');
+      if (!name) return;
+      
+      try {
+        const result = await notesManager.createFolder(name);
+        if (result.success) {
+          await loadFolders();
+          toast('Folder created successfully', 'success');
+        } else {
+          toast('Failed to create folder', 'error');
+        }
+      } catch (error) {
+        console.error('Error creating folder:', error);
+        toast('Failed to create folder', 'error');
+      }
+    }
+    
+    function toggleSidebar() {
+      sidebar.classList.toggle('-translate-x-full');
+      sidebarOverlay.classList.toggle('hidden');
+    }
+    
+    function closeSidebar() {
+      sidebar.classList.add('-translate-x-full');
+      sidebarOverlay.classList.add('hidden');
+    }
+    
+    function openSearch() {
+      searchModal.classList.remove('hidden');
+      searchInput.focus();
+    }
+    
+    function closeSearch() {
+      searchModal.classList.add('hidden');
+      searchInput.value = '';
+      searchResults.innerHTML = '<div class="p-4 text-center text-gray-500 dark:text-gray-400">Start typing to search your notes...</div>';
+    }
+    
+    let searchTimeout;
+    async function handleSearch(e) {
+      const query = e.target.value.trim();
+      
+      if (!query) {
+        searchResults.innerHTML = '<div class="p-4 text-center text-gray-500 dark:text-gray-400">Start typing to search your notes...</div>';
+        return;
+      }
+      
+      clearTimeout(searchTimeout);
+      searchTimeout = setTimeout(async () => {
+        try {
+          searchResults.innerHTML = '<div class="p-4 text-center text-gray-500 dark:text-gray-400">Searching...</div>';
+          
+          const result = await searchNotes(query);
+          if (result.success && result.data.length > 0) {
+            const resultsHTML = result.data.map(note => `
+              <div class="p-4 hover:bg-gray-50 dark:hover:bg-gray-700 cursor-pointer border-b border-gray-200 dark:border-gray-700 last:border-b-0" onclick="window.location.href='/editor.html?id=${note.id}'">
+                <h4 class="font-medium text-gray-900 dark:text-white mb-1">${note.title || 'Untitled'}</h4>
+                <p class="text-sm text-gray-600 dark:text-gray-400 line-clamp-2">${note.snippet || 'No content'}</p>
+                <div class="text-xs text-gray-500 dark:text-gray-400 mt-2">
+                  ${formatDate(note.updated_at)} ${note.folder_name ? `• ${note.folder_name}` : ''}
+                </div>
+              </div>
+            `).join('');
+            searchResults.innerHTML = resultsHTML;
+          } else {
+            searchResults.innerHTML = '<div class="p-4 text-center text-gray-500 dark:text-gray-400">No notes found</div>';
+          }
+        } catch (error) {
+          console.error('Search error:', error);
+          searchResults.innerHTML = '<div class="p-4 text-center text-red-500">Search failed</div>';
+        }
+      }, 300);
+    }
+    
+    function setView(view) {
+      currentView = view;
+      const gridBtn = document.getElementById('grid-view-btn');
+      const listBtn = document.getElementById('list-view-btn');
+      
+      if (view === 'grid') {
+        gridBtn.classList.add('text-gray-500', 'bg-gray-100', 'dark:bg-gray-700', 'dark:text-gray-300');
+        gridBtn.classList.remove('text-gray-400');
+        listBtn.classList.remove('text-gray-500', 'bg-gray-100', 'dark:bg-gray-700', 'dark:text-gray-300');
+        listBtn.classList.add('text-gray-400');
+        
+        notesContainer.className = 'grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4';
+      } else {
+        listBtn.classList.add('text-gray-500', 'bg-gray-100', 'dark:bg-gray-700', 'dark:text-gray-300');
+        listBtn.classList.remove('text-gray-400');
+        gridBtn.classList.remove('text-gray-500', 'bg-gray-100', 'dark:bg-gray-700', 'dark:text-gray-300');
+        gridBtn.classList.add('text-gray-400');
+        
+        notesContainer.className = 'space-y-2';
+      }
+      
+      renderNotes();
+    }
+  </script>
+  
+  <script type="module" src="/js/boot.js"></script>
+</body>
+</html>

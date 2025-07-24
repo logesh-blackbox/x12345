@@ -1,0 +1,359 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Notes App - Your Digital Notebook</title>
+  <meta name="description" content="A powerful note-taking app with real-time sync, collaboration, and offline support. Organize your thoughts, collaborate with others, and access your notes anywhere.">
+  
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&family=Literata:ital@0;1&display=swap" rel="stylesheet">
+  
+  <!-- PWA Manifest -->
+  <link rel="manifest" href="/manifest.json">
+  <meta name="theme-color" content="#6366f1">
+  
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Inter', 'ui-sans-serif', 'system-ui'],
+            serif: ['Literata', 'serif']
+          },
+          colors: {
+            brand: { DEFAULT: '#6366f1', dark: '#4f46e5' }
+          }
+        }
+      },
+      darkMode: 'class'
+    };
+  </script>
+  
+  <link rel="stylesheet" href="/css/overrides.css">
+</head>
+<body class="bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100">
+  <!-- Online/Offline Status -->
+  <div id="online-status" class="hidden"></div>
+  
+  <!-- Navigation -->
+  <nav class="fixed top-0 left-0 right-0 bg-white/80 dark:bg-gray-900/80 backdrop-blur-sm border-b border-gray-200 dark:border-gray-700 z-40">
+    <div class="container mx-auto px-4 h-16 flex items-center justify-between">
+      <div class="flex items-center space-x-2">
+        <div class="w-8 h-8 bg-brand rounded-lg flex items-center justify-center">
+          <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
+          </svg>
+        </div>
+        <span class="text-xl font-semibold">Notes App</span>
+      </div>
+      
+      <div class="flex items-center space-x-4">
+        <button id="install-app-btn" class="btn btn-secondary hidden">
+          Install App
+        </button>
+        <a href="/login.html" class="btn btn-primary">
+          Get Started
+        </a>
+      </div>
+    </div>
+  </nav>
+  
+  <!-- Hero Section -->
+  <section class="pt-24 pb-16 bg-gradient-to-br from-brand to-indigo-900 text-white">
+    <div class="container mx-auto px-4 text-center">
+      <h1 class="text-5xl md:text-6xl font-bold mb-6">
+        Your Digital
+        <span class="text-transparent bg-clip-text bg-gradient-to-r from-yellow-400 to-orange-500">
+          Notebook
+        </span>
+      </h1>
+      <p class="text-xl md:text-2xl mb-8 text-indigo-100 max-w-3xl mx-auto">
+        Capture ideas, organize thoughts, and collaborate seamlessly. 
+        Your notes, everywhere you need them.
+      </p>
+      <div class="flex flex-col sm:flex-row gap-4 justify-center">
+        <a href="/login.html?mode=signup" class="btn bg-white text-brand hover:bg-gray-100 text-lg px-8 py-3">
+          Start Writing
+        </a>
+        <a href="#features" class="btn border-2 border-white text-white hover:bg-white hover:text-brand text-lg px-8 py-3">
+          Learn More
+        </a>
+      </div>
+    </div>
+  </section>
+  
+  <!-- Features Section -->
+  <section id="features" class="py-20 bg-gray-50 dark:bg-gray-800">
+    <div class="container mx-auto px-4">
+      <div class="text-center mb-16">
+        <h2 class="text-4xl font-bold mb-4">Everything you need to stay organized</h2>
+        <p class="text-xl text-gray-600 dark:text-gray-400 max-w-2xl mx-auto">
+          Powerful features designed to help you capture, organize, and share your ideas effortlessly.
+        </p>
+      </div>
+      
+      <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+        <!-- Real-time Sync -->
+        <div class="bg-white dark:bg-gray-900 p-8 rounded-xl shadow-sm hover:shadow-md transition-shadow">
+          <div class="w-12 h-12 bg-brand/10 rounded-lg flex items-center justify-center mb-4">
+            <svg class="w-6 h-6 text-brand" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
+            </svg>
+          </div>
+          <h3 class="text-xl font-semibold mb-3">Real-time Sync</h3>
+          <p class="text-gray-600 dark:text-gray-400">
+            Your notes sync instantly across all devices. Start writing on your phone, continue on your laptop.
+          </p>
+        </div>
+        
+        <!-- Collaboration -->
+        <div class="bg-white dark:bg-gray-900 p-8 rounded-xl shadow-sm hover:shadow-md transition-shadow">
+          <div class="w-12 h-12 bg-brand/10 rounded-lg flex items-center justify-center mb-4">
+            <svg class="w-6 h-6 text-brand" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path>
+            </svg>
+          </div>
+          <h3 class="text-xl font-semibold mb-3">Team Collaboration</h3>
+          <p class="text-gray-600 dark:text-gray-400">
+            Share notes with teammates, leave comments, and collaborate in real-time on shared documents.
+          </p>
+        </div>
+        
+        <!-- Offline Support -->
+        <div class="bg-white dark:bg-gray-900 p-8 rounded-xl shadow-sm hover:shadow-md transition-shadow">
+          <div class="w-12 h-12 bg-brand/10 rounded-lg flex items-center justify-center mb-4">
+            <svg class="w-6 h-6 text-brand" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"></path>
+            </svg>
+          </div>
+          <h3 class="text-xl font-semibold mb-3">Offline Ready</h3>
+          <p class="text-gray-600 dark:text-gray-400">
+            Keep writing even without internet. Your changes sync automatically when you're back online.
+          </p>
+        </div>
+        
+        <!-- Organization -->
+        <div class="bg-white dark:bg-gray-900 p-8 rounded-xl shadow-sm hover:shadow-md transition-shadow">
+          <div class="w-12 h-12 bg-brand/10 rounded-lg flex items-center justify-center mb-4">
+            <svg class="w-6 h-6 text-brand" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14-7H5a2 2 0 00-2 2v11a2 2 0 002 2h14a2 2 0 002-2V6a2 2 0 00-2-2z"></path>
+            </svg>
+          </div>
+          <h3 class="text-xl font-semibold mb-3">Smart Organization</h3>
+          <p class="text-gray-600 dark:text-gray-400">
+            Organize with folders, tags, and powerful search. Find any note instantly with full-text search.
+          </p>
+        </div>
+        
+        <!-- Rich Editor -->
+        <div class="bg-white dark:bg-gray-900 p-8 rounded-xl shadow-sm hover:shadow-md transition-shadow">
+          <div class="w-12 h-12 bg-brand/10 rounded-lg flex items-center justify-center mb-4">
+            <svg class="w-6 h-6 text-brand" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"></path>
+            </svg>
+          </div>
+          <h3 class="text-xl font-semibold mb-3">Rich Text Editor</h3>
+          <p class="text-gray-600 dark:text-gray-400">
+            Beautiful writing experience with Markdown support, formatting tools, and distraction-free mode.
+          </p>
+        </div>
+        
+        <!-- Security -->
+        <div class="bg-white dark:bg-gray-900 p-8 rounded-xl shadow-sm hover:shadow-md transition-shadow">
+          <div class="w-12 h-12 bg-brand/10 rounded-lg flex items-center justify-center mb-4">
+            <svg class="w-6 h-6 text-brand" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path>
+            </svg>
+          </div>
+          <h3 class="text-xl font-semibold mb-3">Secure & Private</h3>
+          <p class="text-gray-600 dark:text-gray-400">
+            Your notes are encrypted and secure. Only you and people you share with can access your content.
+          </p>
+        </div>
+      </div>
+    </div>
+  </section>
+  
+  <!-- Screenshot Section -->
+  <section class="py-20">
+    <div class="container mx-auto px-4">
+      <div class="text-center mb-16">
+        <h2 class="text-4xl font-bold mb-4">Beautiful, intuitive interface</h2>
+        <p class="text-xl text-gray-600 dark:text-gray-400 max-w-2xl mx-auto">
+          Designed for focus and productivity. Clean, modern interface that gets out of your way.
+        </p>
+      </div>
+      
+      <div class="max-w-4xl mx-auto">
+        <img 
+          src="https://images.pexels.com/photos/590016/pexels-photo-590016.jpeg?auto=compress&cs=tinysrgb&w=1200&h=800&fit=crop" 
+          alt="Notes App Dashboard Screenshot" 
+          class="w-full rounded-xl shadow-2xl"
+          loading="lazy"
+        />
+      </div>
+    </div>
+  </section>
+  
+  <!-- Pricing Section -->
+  <section class="py-20 bg-gray-50 dark:bg-gray-800">
+    <div class="container mx-auto px-4">
+      <div class="text-center mb-16">
+        <h2 class="text-4xl font-bold mb-4">Simple, transparent pricing</h2>
+        <p class="text-xl text-gray-600 dark:text-gray-400 max-w-2xl mx-auto">
+          Start free, upgrade when you need more. No hidden fees, cancel anytime.
+        </p>
+      </div>
+      
+      <div class="grid md:grid-cols-2 gap-8 max-w-4xl mx-auto">
+        <!-- Free Plan -->
+        <div class="bg-white dark:bg-gray-900 p-8 rounded-xl shadow-sm">
+          <h3 class="text-2xl font-bold mb-2">Free</h3>
+          <div class="text-4xl font-bold mb-6">$0<span class="text-lg text-gray-500">/month</span></div>
+          <ul class="space-y-3 mb-8">
+            <li class="flex items-center">
+              <svg class="w-5 h-5 text-green-500 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+              </svg>
+              Unlimited personal notes
+            </li>
+            <li class="flex items-center">
+              <svg class="w-5 h-5 text-green-500 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+              </svg>
+              Sync across devices
+            </li>
+            <li class="flex items-center">
+              <svg class="w-5 h-5 text-green-500 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+              </svg>
+              Basic organization
+            </li>
+            <li class="flex items-center">
+              <svg class="w-5 h-5 text-green-500 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+              </svg>
+              Offline support
+            </li>
+          </ul>
+          <a href="/login.html?mode=signup" class="btn btn-secondary w-full">
+            Get Started Free
+          </a>
+        </div>
+        
+        <!-- Pro Plan -->
+        <div class="bg-brand text-white p-8 rounded-xl shadow-sm relative">
+          <div class="absolute -top-4 left-1/2 transform -translate-x-1/2">
+            <span class="bg-yellow-400 text-gray-900 px-4 py-1 rounded-full text-sm font-semibold">
+              Most Popular
+            </span>
+          </div>
+          <h3 class="text-2xl font-bold mb-2">Pro</h3>
+          <div class="text-4xl font-bold mb-6">$9<span class="text-lg text-indigo-200">/month</span></div>
+          <ul class="space-y-3 mb-8">
+            <li class="flex items-center">
+              <svg class="w-5 h-5 text-green-400 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+              </svg>
+              Everything in Free
+            </li>
+            <li class="flex items-center">
+              <svg class="w-5 h-5 text-green-400 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+              </svg>
+              Team collaboration
+            </li>
+            <li class="flex items-center">
+              <svg class="w-5 h-5 text-green-400 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+              </svg>
+              Advanced search
+            </li>
+            <li class="flex items-center">
+              <svg class="w-5 h-5 text-green-400 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+              </svg>
+              Priority support
+            </li>
+          </ul>
+          <a href="/login.html?mode=signup&plan=pro" class="btn bg-white text-brand hover:bg-gray-100 w-full">
+            Start Pro Trial
+          </a>
+        </div>
+      </div>
+    </div>
+  </section>
+  
+  <!-- CTA Section -->
+  <section class="py-20">
+    <div class="container mx-auto px-4 text-center">
+      <h2 class="text-4xl font-bold mb-4">Ready to get organized?</h2>
+      <p class="text-xl text-gray-600 dark:text-gray-400 mb-8 max-w-2xl mx-auto">
+        Join thousands of users who have transformed their note-taking experience.
+      </p>
+      <a href="/login.html?mode=signup" class="btn btn-primary text-lg px-8 py-3">
+        Start Your Journey
+      </a>
+    </div>
+  </section>
+  
+  <!-- Footer -->
+  <footer class="bg-gray-900 text-gray-300 py-12">
+    <div class="container mx-auto px-4">
+      <div class="grid md:grid-cols-4 gap-8">
+        <div>
+          <div class="flex items-center space-x-2 mb-4">
+            <div class="w-8 h-8 bg-brand rounded-lg flex items-center justify-center">
+              <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
+              </svg>
+            </div>
+            <span class="text-xl font-semibold text-white">Notes App</span>
+          </div>
+          <p class="text-gray-400">
+            Your digital notebook for capturing ideas, organizing thoughts, and collaborating with others.
+          </p>
+        </div>
+        
+        <div>
+          <h4 class="font-semibold text-white mb-4">Product</h4>
+          <ul class="space-y-2">
+            <li><a href="#features" class="hover:text-white transition-colors">Features</a></li>
+            <li><a href="/login.html" class="hover:text-white transition-colors">Pricing</a></li>
+            <li><a href="/login.html" class="hover:text-white transition-colors">Security</a></li>
+          </ul>
+        </div>
+        
+        <div>
+          <h4 class="font-semibold text-white mb-4">Support</h4>
+          <ul class="space-y-2">
+            <li><a href="/login.html" class="hover:text-white transition-colors">Help Center</a></li>
+            <li><a href="/login.html" class="hover:text-white transition-colors">Contact</a></li>
+            <li><a href="/login.html" class="hover:text-white transition-colors">Status</a></li>
+          </ul>
+        </div>
+        
+        <div>
+          <h4 class="font-semibold text-white mb-4">Company</h4>
+          <ul class="space-y-2">
+            <li><a href="/login.html" class="hover:text-white transition-colors">About</a></li>
+            <li><a href="/login.html" class="hover:text-white transition-colors">Privacy</a></li>
+            <li><a href="/login.html" class="hover:text-white transition-colors">Terms</a></li>
+          </ul>
+        </div>
+      </div>
+      
+      <div class="border-t border-gray-800 mt-8 pt-8 text-center text-gray-400">
+        <p>&copy; 2024 Notes App. All rights reserved.</p>
+      </div>
+    </div>
+  </footer>
+  
+  <script type="module" src="/js/boot.js"></script>
+</body>
+</html>
